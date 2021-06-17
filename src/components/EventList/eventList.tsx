@@ -1,6 +1,6 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
-// import { useParams } from "react-router";
-import useQueryString from "../../useQueryString";
+import React, { FunctionComponent } from "react";
+import EventCard from "./eventCard";
+import Tags from "./tags";
 
 type EventProps = {
     event: any,
@@ -11,23 +11,24 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent } ) 
 {
 
 
-
-    // const param = useParams();
-
-    useEffect( () =>
-    {
-
-    }, [] )
     const current = `${event} ${subEvent}`
 
     return (
-        <div>
-            {/* {state.event_category}
-            {state.event_sub_category}
-            {state.page}
-            {state.tag_list} */}
-            <h1>{current}</h1>
+        <>
+            <div className="container my-12 mx-auto px-4 md:px-12">
+                <div className="grid grid-cols-3 gap-4">
 
-        </div>
+                    <EventCard />
+                    <EventCard />
+                    <EventCard />
+                    <EventCard />
+                    <EventCard />
+                    <EventCard />
+
+
+                </div>
+            </div>
+
+        </>
     )
 }
