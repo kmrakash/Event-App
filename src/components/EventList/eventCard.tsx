@@ -1,21 +1,16 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
+import Tag from "./tags";
+import { EventCardProps, User } from "../../global"
 
-function Tag ( { children }: { children: any } )
-{
-    return (
-        <div className="mb-2 mr-2 py-1 px-3.5 text-sm rounded-md" style={{ color: "#616161", background: "#eee", height: "max-content" }}>
-            {children}
-        </div>
-    )
-}
 
-function TooltipImg ()
+
+const TooltipImg: FunctionComponent<User> = ( { name, image_url } ) =>
 {
     return (
         <div className="relative flex flex-col items-center group">
-            <img className="rounded-full h-6 w-6 flex items-center justify-center object-contain border border-solid" src="https://lh3.googleusercontent.com/a-/AOh14GgBDIyt46zZtYbG3rDyFnwsDiUo5HRwn6s3TdHr=s96-c" />
+            <img className="rounded-full h-6 w-6 flex items-center justify-center object-contain border border-solid" src={image_url} />
             <div className="absolute bottom-0 flex flex-col items-center hidden mb-6 group-hover:flex">
-                <span className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg">A top aligned tooltip.</span>
+                <span className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg">{name}</span>
                 <div className="w-3 h-3 -mt-2 rotate-45 bg-black"></div>
             </div>
         </div>
@@ -23,15 +18,60 @@ function TooltipImg ()
 }
 
 
-function EventCard ()
+// type EventCardProps = {
+//     id: string,
+//     name: string,
+//     short_desc: string,
+//     cover_picture: string,
+//     registration_start_time: number,
+//     registration_end_time: number,
+//     event_start_time: number,
+//     event_end_time: number,
+//     venue: string,
+//     fees: number,
+//     currency: string,
+//     registration_status: string,
+//     user_already_registered: number | null,
+//     start_time: number,
+//     end_time: number,
+//     registered_users: {
+//         top_users: Array<User>,
+//         other_users_count: number,
+//         show_users_count: boolean
+//     }
+//     seats_left: number,
+//     seats_filled: number,
+//     slug: string,
+//     orderable_key: string,
+//     has_started: boolean,
+//     highlight_event: boolean,
+//     card_tags: Array<string>,
+//     mobile_cover_picture: string,
+//     is_college_specific: boolean,
+//     event_category: string,
+//     event_sub_category: string
+// }
+
+export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
 {
+    console.log( "Event card", event );
+
+    if ( !event.id ) return (
+        <>
+            <h1>No Event</h1>
+        </>
+    )
+
+    console.log( ( new Date( event.registration_end_time ) ).toString() )
+    console.log( ( new Date( event.registration_end_time ) ).toUTCString() )
+
     return (
         <article className="overflow-hidden rounded-lg shadow-lg text-gray-500 text-sm font-normal cursor-pointer">
 
             <header className="relative">
                 <div className="">
 
-                    <img alt="Placeholder" className=" h-auto w-full" src="https://files.codingninjas.in/scolarship-mobile-version-event-10896.jpg" />
+                    <img alt="Event cover picture" className=" h-auto w-full" src={event.cover_picture} />
                 </div>
 
                 <div className="absolute flex  bottom-2 right-2 py-2 px-3 rounded-sm" style={{ color: "#121212", background: "#fff" }}>
@@ -50,7 +90,7 @@ function EventCard ()
 
                 <div className="mb-2 border-b-2 border-solid">
                     <h1 className="text-lg font-bold min-h-50 mb-2 text-gray-900">
-                        Coding Ninjas Admission & Scholarship Test june'21
+                        {event.name}
                     </h1>
                     <div className="mb-2 border-1 border-solid flex">
                         <div className="flex flex-col mr-3">
@@ -60,25 +100,32 @@ function EventCard ()
 
                         <div className="flex flex-col mr-3">
                             <p className="font-normal">Entry Fee</p>
-                            <p className="font-semibold text-gray-800">Free</p>
+                            <p className="font-semibold text-gray-800">{`${event.currency} ${event.fees}`}</p>
                         </div>
 
                         <div className="flex flex-col mr-3">
                             <p className="font-normal">Venue</p>
-                            <p className="font-semibold text-gray-800">Online , CodeZen</p>
+                            <p className="font-semibold text-gray-800">{event.venue}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="text-gray-700 overflow-ellipsis overflow-hidden text-sm h-14">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia numquam maxime sed, id perspiciatis, quas praesentium impedit eligendi saepe amet at earum rem aspernatur? Ab saepe suscipit sit esse aspernatur.
+                    {event.short_desc}
                 </div>
 
                 <div className="flex flex-wrap h-16 mt-5">
-                    <Tag> <p>Scholarship</p> </Tag>
-                    <Tag> Scholarship </Tag>
-                    <Tag> Scholarship </Tag>
-                    <Tag> Scholarship </Tag>
+
+                    {
+                        event.card_tags.length && event.card_tags.map( ( tag, idx ) =>
+                        {
+                            return (
+                                <Tag key={tag + idx}>
+                                    {tag}
+                                </Tag>
+                            )
+                        } )
+                    }
                 </div>
             </main>
 
@@ -86,11 +133,18 @@ function EventCard ()
 
                 <div className="ml-3">
                     <div className="flex">
-                        <TooltipImg />
-                        <TooltipImg />
-                        <TooltipImg />
-                        <TooltipImg />
-                        <TooltipImg />
+                        {
+                            event.registered_users.top_users.length && event.registered_users.top_users.map( ( usr, idx ) =>
+                            {
+                                return (
+                                    <TooltipImg
+                                        key={idx + usr.name}
+                                        name={usr.name}
+                                        image_url={usr.image_url}
+                                    />
+                                )
+                            } )
+                        }
                     </div>
                     <span>and <strong className="text-gray-900">82</strong> others registered</span>
                 </div>
@@ -104,4 +158,4 @@ function EventCard ()
     )
 }
 
-export default EventCard;
+// export default EventCard;

@@ -1,31 +1,131 @@
-import React, { FunctionComponent } from "react";
-import EventCard from "./eventCard";
-import Tags from "./tags";
+import React, { FunctionComponent, useEffect, useState } from "react";
+import { EventCard } from "./eventCard";
+import Tag from "./tags";
+import axios from "axios";
+import { EventCardProps } from "../../global"
 
 type EventProps = {
     event: any,
     subEvent: any
+    eventTags: Array<string>
+    selectedTag: any,
+    setSelectedTag: any
 }
 
-export const EventList: FunctionComponent<EventProps> = ( { event, subEvent } ) =>
+export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eventTags, selectedTag, setSelectedTag } ) =>
 {
 
+    // const [ selectedTag, setSelectedTag ] = useState<Array<string>>( [] );
+    const [ eventsArray, setEventsArray ] = useState<EventCardProps[] | []>( [] );
+    const [ pageCount, setPageCount ] = useState( 0 );
 
-    const current = `${event} ${subEvent}`
+
+    // const current = `${event} ${subEvent}`
+
+    const handleChange = ( e: any ) =>
+    {
+        let options = selectedTag;
+        let index;
+        if ( e.target.checked )
+        {
+            options.push( e.target.value );
+            e.target.parentNode.style.backgroundColor = "#fa7328";
+            e.target.parentNode.style.color = "#fff"
+        }
+        else
+        {
+            index = options.indexOf( e.target.value );
+            options.splice( index, 1 );
+            e.target.parentNode.style.backgroundColor = "#eee";
+            e.target.parentNode.style.color = "#616161"
+        }
+        setSelectedTag( [ ...options ] );
+    }
+
+    useEffect( () =>
+    {
+        console.log( "tag list", selectedTag );
+
+        (
+            async function fetchEvents ()
+            {
+                try
+                {
+
+                    const response = await axios.get( "/events", {
+                        params: {
+                            event_category: event,
+                            event_sub_category: subEvent,
+                            tag_list: 0,
+                            offset: 0
+                        }
+                    } )
+
+                    if ( response.statusText === 'OK' )
+                    {
+                        // console.log( "event data", response.data.data );
+                        const { events, page_count } = response.data.data;
+                        // console.log( "eventsArray", events );
+                        setEventsArray( events );
+                        setPageCount( page_count );
+                    }
+
+
+                } catch ( error )
+                {
+                    console.log( "failed to fetch events", error );
+                }
+
+
+            }
+        )();
+    }, [ event, subEvent, selectedTag ] );
+
 
     return (
         <>
-            <div className="container my-12 mx-auto px-4 md:px-12">
-                <div className="grid grid-cols-3 gap-4">
+            <div className="container flex my-12 mx-auto px-4 md:px-12">
+                <div className="grid grid-cols-2 gap-4 w-5/6">
+                    {
+                        eventsArray.length && eventsArray.map( ( event, idx ) =>
+                        {
+                            if ( event )
+                                return (
+                                    <EventCard
+                                        key={idx}
+                                        {...event}
+                                    />
+                                )
 
-                    <EventCard />
-                    <EventCard />
-                    <EventCard />
-                    <EventCard />
-                    <EventCard />
-                    <EventCard />
+                        } )
+                    }
+                </div>
+                <div>
+                    <form className="ml-8">
+                        <span className="font-semibold mb-2">TAGS</span>
+                        <div className="grid col-auto">
+                            {
+                                eventTags.length && eventTags.map( ( tagTitle, index ) =>
+                                {
+                                    return (
+                                        <label key={index + tagTitle} htmlFor={tagTitle} className="cursor-pointer mb-2">
+                                            <Tag>
+                                                <input
+                                                    type="checkbox"
+                                                    className="absolute -left-full bg-red-100"
+                                                    value={tagTitle}
+                                                    name={tagTitle}
+                                                    id={tagTitle}
 
-
+                                                    onChange={handleChange} />
+                                                {tagTitle}
+                                            </Tag>
+                                        </label>
+                                    )
+                                } )
+                            }
+                        </div>
+                    </form>
                 </div>
             </div>
 

@@ -1,12 +1,12 @@
 import React from "react";
 
-function Tags ()
+function Tag ( { children }: { children: any } )
 {
     return (
-        <>
-            <h1>Tag List</h1>
-        </>
+        <div className="mb-2 mr-2 py-1 px-3.5 text-sm rounded" style={{ color: "#616161", background: "#eee", height: "max-content" }}>
+            {children}
+        </div>
     )
 }
 
-export default Tags;
+export default Tag;
