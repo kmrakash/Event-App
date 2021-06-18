@@ -1,6 +1,5 @@
-import React, { createContext } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
-// import "tailwindcss/tailwind.css"
 import "./style.css"
 import App from './App'
 import axios from "axios";

@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react"
 import { Nav } from "./Nav"
-// import { NavLink } from "react-router-dom"
 import { NavItem } from "./NavItem"
 import { EventSubCategory } from "./eventSubcategory"
 
@@ -63,9 +62,3 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
         </>
     )
 }
-
-// 
-// 
-// 
-// 
-// 

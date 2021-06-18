@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react"
 import { Nav } from "./Nav"
 import { NavItem } from "./NavItem"
-import useQueryString from "../../useQueryString"
+
 
 type EventProps = {
     event: string | string[] | ( ( newValue: any ) => void ),

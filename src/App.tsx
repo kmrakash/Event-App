@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
+import { BrowserRouter as Router, Route } from "react-router-dom"
 import { Navbar } from "./components/Navbar"
 import { EventList } from "./components/EventList/eventList"
 import useQueryString from './useQueryString'

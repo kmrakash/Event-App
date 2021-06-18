@@ -9,8 +9,6 @@ type EventProps = {
     event: any,
     subEvent: any
     eventTags: Array<string>
-    // selectedTag: any,
-    // setSelectedTag: any
     initialQueryTag?: any
     setQueryTag: any
 }
