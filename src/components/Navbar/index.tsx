@@ -21,6 +21,7 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
                 <NavItem
                     href={`/?event_category=ALL_EVENT&event_sub_category=${subEvent}&page=1`}
                     currentEvent={"ALL_EVENT"}
+                    thisEvent={event}
                     setCurrentEvent={setEvent}>
                     All EVENT
                 </NavItem>
@@ -28,6 +29,7 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
                 <NavItem
                     href={`/?event_category=WEBINAR&event_sub_category=${subEvent}&page=1`}
                     currentEvent={"WEBINAR"}
+                    thisEvent={event}
                     setCurrentEvent={setEvent}>
                     WEBINAR
                 </NavItem>
@@ -35,6 +37,7 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
                 <NavItem
                     href="/?event_category=CODING_EVENT&event_sub_category=Upcoming&page=1"
                     currentEvent={"CODING_EVENT"}
+                    thisEvent={event}
                     setCurrentEvent={setEvent}>
                     CODING_EVENT
                 </NavItem>
@@ -42,6 +45,7 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
                 <NavItem
                     href="/?event_category=BOOTCAMP_EVENT&event_sub_category=Upcoming&page=1"
                     currentEvent={"BOOTCAMP_EVENT"}
+                    thisEvent={event}
                     setCurrentEvent={setEvent}>
                     BOOTCAMP_EVENT
                 </NavItem>
@@ -49,6 +53,7 @@ export const Navbar: FunctionComponent<NavbarProps> = ( { event, setEvent, subEv
                 <NavItem
                     href="/?event_category=WORKSHOP&event_sub_category=Upcoming&page=1"
                     currentEvent={"WORKSHOP"}
+                    thisEvent={event}
                     setCurrentEvent={setEvent}>
                     WORKSHOP
                 </NavItem>

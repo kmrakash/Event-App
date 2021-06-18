@@ -3,19 +3,24 @@ import { EventCard } from "./eventCard";
 import Tag from "./tags";
 import axios from "axios";
 import { EventCardProps } from "../../global"
+import moment from "moment";
 
 type EventProps = {
     event: any,
     subEvent: any
     eventTags: Array<string>
-    selectedTag: any,
-    setSelectedTag: any
+    // selectedTag: any,
+    // setSelectedTag: any
+    initialQueryTag?: any
+    setQueryTag: any
 }
 
-export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eventTags, selectedTag, setSelectedTag } ) =>
+export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eventTags, initialQueryTag, setQueryTag } ) =>
 {
 
-    // const [ selectedTag, setSelectedTag ] = useState<Array<string>>( [] );
+    const convertToArray = [ initialQueryTag.split( "," ) ];
+    // console.log( "coming on mount", [ initialQueryTag.split( "," ) ] );
+    const [ selectedTag, setSelectedTag ] = useState<Array<string>>( [ ...convertToArray ] );
     const [ eventsArray, setEventsArray ] = useState<EventCardProps[] | []>( [] );
     const [ pageCount, setPageCount ] = useState( 0 );
 
@@ -24,6 +29,8 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
 
     const handleChange = ( e: any ) =>
     {
+        // console.log( "intialQueryTag", initialQueryTag );
+
         let options = selectedTag;
         let index;
         if ( e.target.checked )
@@ -40,11 +47,13 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
             e.target.parentNode.style.color = "#616161"
         }
         setSelectedTag( [ ...options ] );
+        let joinQuery = options.join( "" );
+        setQueryTag( joinQuery );
     }
 
     useEffect( () =>
     {
-        console.log( "tag list", selectedTag );
+        // console.log( "tag list", selectedTag );
 
         (
             async function fetchEvents ()
@@ -56,7 +65,7 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
                         params: {
                             event_category: event,
                             event_sub_category: subEvent,
-                            tag_list: 0,
+                            tag_list: selectedTag.join(),
                             offset: 0
                         }
                     } )
@@ -65,7 +74,6 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
                     {
                         // console.log( "event data", response.data.data );
                         const { events, page_count } = response.data.data;
-                        // console.log( "eventsArray", events );
                         setEventsArray( events );
                         setPageCount( page_count );
                     }
@@ -82,14 +90,37 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
     }, [ event, subEvent, selectedTag ] );
 
 
+    // sort the array on basis of start time
+    eventsArray.sort( ( a, b ) => ( a.start_time > b.start_time ) ? 1 : ( ( a.start_time > b.start_time ) ? -1 : 0 ) );
+
     return (
         <>
             <div className="container flex my-12 mx-auto px-4 md:px-12">
                 <div className="grid grid-cols-2 gap-4 w-5/6">
                     {
-                        eventsArray.length && eventsArray.map( ( event, idx ) =>
+                        eventsArray.length ? eventsArray.map( ( event, idx ) =>
                         {
-                            if ( event )
+                            const todayDate = moment().format( 'h:mm a, Do MM YYYY' );
+                            const registerationEndTime = moment( event.registration_end_time * 1000 ).format( 'h:mm a, Do MMMM YYYY' );
+                            const isArchived = registerationEndTime > todayDate;
+                            if ( subEvent === "Archived" && isArchived )
+                            {
+                                return (
+                                    <EventCard
+                                        key={idx}
+                                        {...event}
+                                    />
+                                )
+                            }
+
+                            else if ( subEvent === "Upcoming" && !isArchived )
+                                return (
+                                    <EventCard
+                                        key={idx}
+                                        {...event}
+                                    />
+                                )
+                            else if ( subEvent === "All_Time_Favorite" )
                                 return (
                                     <EventCard
                                         key={idx}
@@ -97,7 +128,13 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
                                     />
                                 )
 
-                        } )
+                        } ) : (
+                            <>
+                                <div className="grid place-items-center">
+                                    <h1 className="text-3xl">No Events</h1>
+                                </div>
+                            </>
+                        )
                     }
                 </div>
                 <div>
@@ -105,7 +142,7 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
                         <span className="font-semibold mb-2">TAGS</span>
                         <div className="grid col-auto">
                             {
-                                eventTags.length && eventTags.map( ( tagTitle, index ) =>
+                                eventTags.length ? eventTags.map( ( tagTitle, index ) =>
                                 {
                                     return (
                                         <label key={index + tagTitle} htmlFor={tagTitle} className="cursor-pointer mb-2">
@@ -122,7 +159,13 @@ export const EventList: FunctionComponent<EventProps> = ( { event, subEvent, eve
                                             </Tag>
                                         </label>
                                     )
-                                } )
+                                } ) : (
+                                    <>
+                                        <div className="text-3xl">
+                                            <span>Fetching ....</span>
+                                        </div>
+                                    </>
+                                )
                             }
                         </div>
                     </form>

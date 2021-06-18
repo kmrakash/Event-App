@@ -10,7 +10,7 @@ function App ()
 
   const [ event, setEvent ] = useQueryString( "event_category", "ALL_EVENTS" );
   const [ subevent, setSubEvent ] = useQueryString( "event_sub_category", "Upcoming" );
-  const [ selectedTag, setSelectedTag ] = useQueryString( "tags_list", );
+  const [ selectedTagQuery, setSelectedTagQuery ] = useQueryString( "tags_list", "" );
   const [ eventTags, setEventTags ] = useState( [] );
 
 
@@ -55,8 +55,8 @@ function App ()
                 event={event}
                 subEvent={subevent}
                 eventTags={eventTags}
-                selectedTag={selectedTag}
-                setSelectedTag={setSelectedTag}
+                initialQueryTag={selectedTagQuery}
+                setQueryTag={setSelectedTagQuery}
               />
             </div>
           </Route>

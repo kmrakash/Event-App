@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from "react";
 import Tag from "./tags";
 import { EventCardProps, User } from "../../global"
+import moment from "moment";
 
 
 
@@ -18,43 +19,9 @@ const TooltipImg: FunctionComponent<User> = ( { name, image_url } ) =>
 }
 
 
-// type EventCardProps = {
-//     id: string,
-//     name: string,
-//     short_desc: string,
-//     cover_picture: string,
-//     registration_start_time: number,
-//     registration_end_time: number,
-//     event_start_time: number,
-//     event_end_time: number,
-//     venue: string,
-//     fees: number,
-//     currency: string,
-//     registration_status: string,
-//     user_already_registered: number | null,
-//     start_time: number,
-//     end_time: number,
-//     registered_users: {
-//         top_users: Array<User>,
-//         other_users_count: number,
-//         show_users_count: boolean
-//     }
-//     seats_left: number,
-//     seats_filled: number,
-//     slug: string,
-//     orderable_key: string,
-//     has_started: boolean,
-//     highlight_event: boolean,
-//     card_tags: Array<string>,
-//     mobile_cover_picture: string,
-//     is_college_specific: boolean,
-//     event_category: string,
-//     event_sub_category: string
-// }
 
 export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
 {
-    console.log( "Event card", event );
 
     if ( !event.id ) return (
         <>
@@ -62,8 +29,11 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
         </>
     )
 
-    console.log( ( new Date( event.registration_end_time ) ).toString() )
-    console.log( ( new Date( event.registration_end_time ) ).toUTCString() )
+    const todayDate = moment().format( 'h:mm a, Do MM YYYY' );
+    const registerationEndTime = moment( event.registration_end_time * 1000 ).format( 'h:mm a, Do MMMM YYYY' );
+    const headerRegisterationEndTime = moment( event.registration_end_time * 1000 ).format( 'Do MMMM YYYY, h:mm a' );
+    const registerationStartTime = moment( event.registration_start_time * 1000 ).format( 'h:mm a, Do MMMM YYYY' );
+    const isArchived = registerationEndTime < todayDate;
 
     return (
         <article className="overflow-hidden rounded-lg shadow-lg text-gray-500 text-sm font-normal cursor-pointer">
@@ -74,15 +44,21 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
                     <img alt="Event cover picture" className=" h-auto w-full" src={event.cover_picture} />
                 </div>
 
-                <div className="absolute flex  bottom-2 right-2 py-2 px-3 rounded-sm" style={{ color: "#121212", background: "#fff" }}>
+                {
+                    isArchived ? (
+                        <>
+                            <div className="absolute flex  bottom-2 right-2 py-2 px-3 rounded-sm" style={{ color: "#121212", background: "#fff" }}>
 
-                    <span className=" relative top-1 flex h-3 w-3 mr-1">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                    </span>
+                                <span className=" relative top-1 flex h-3 w-3 mr-1">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
 
-                    <p >Registration open till 18 jun , 7:00 PM</p>
-                </div>
+                                <p >Registration open till {headerRegisterationEndTime}</p>
+                            </div>
+                        </>
+                    ) : null
+                }
 
             </header>
 
@@ -95,12 +71,17 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
                     <div className="mb-2 border-1 border-solid flex">
                         <div className="flex flex-col mr-3">
                             <p className=" font-normal">Starts on</p>
-                            <p className="font-semibold text-gray-800">09:00 PM , 19 Jun 2021</p>
+                            <p className="font-semibold text-gray-800">{registerationStartTime}</p>
                         </div>
 
                         <div className="flex flex-col mr-3">
                             <p className="font-normal">Entry Fee</p>
-                            <p className="font-semibold text-gray-800">{`${event.currency} ${event.fees}`}</p>
+                            {
+                                event.fees ? (
+                                    <p className="font-semibold text-gray-800">{`${event.currency} ${event.fees}`}</p>
+                                ) :
+                                    <p className="font-semibold text-gray-800">Free</p>
+                            }
                         </div>
 
                         <div className="flex flex-col mr-3">
@@ -117,14 +98,14 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
                 <div className="flex flex-wrap h-16 mt-5">
 
                     {
-                        event.card_tags.length && event.card_tags.map( ( tag, idx ) =>
+                        event.card_tags.length ? event.card_tags.map( ( tag, idx ) =>
                         {
                             return (
                                 <Tag key={tag + idx}>
                                     {tag}
                                 </Tag>
                             )
-                        } )
+                        } ) : null
                     }
                 </div>
             </main>
@@ -134,7 +115,7 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
                 <div className="ml-3">
                     <div className="flex">
                         {
-                            event.registered_users.top_users.length && event.registered_users.top_users.map( ( usr, idx ) =>
+                            event.registered_users.top_users.length ? event.registered_users.top_users.map( ( usr, idx ) =>
                             {
                                 return (
                                     <TooltipImg
@@ -143,15 +124,28 @@ export const EventCard: FunctionComponent<EventCardProps> = ( { ...event } ) =>
                                         image_url={usr.image_url}
                                     />
                                 )
-                            } )
+                            } ) : null
                         }
                     </div>
-                    <span>and <strong className="text-gray-900">82</strong> others registered</span>
+                    {
+                        event.registered_users.other_users_count ? (
+                            <span>and <strong className="text-gray-900">{event.registered_users.other_users_count}</strong> others registered</span>
+                        ) :
+                            null
+                    }
+
                 </div>
 
-                <div>
-                    <img className="h-8" src="https://files.codingninjas.in/0000000000001272.png" />
-                </div>
+                {
+                    isArchived ? (
+                        <>
+                            <div>
+                                <img className="h-8" src="https://files.codingninjas.in/0000000000001272.png" />
+                            </div>
+                        </>
+                    ) : null
+                }
+
             </footer>
 
         </article>
